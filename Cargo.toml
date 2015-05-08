@@ -4,8 +4,10 @@ version = "0.0.1"
 authors = ["Dan Lidral-Porter <dlp@aperiodic.org>"]
 
 [dependencies]
-xlib = "*"
 libc = "*"
+
+[dependencies.xlib]
+git = "https://github.com/servo/rust-xlib.git"
 
 [[bin]]
 name = "secondsight"
