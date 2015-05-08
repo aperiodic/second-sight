@@ -8,5 +8,5 @@ mod xwrapper;
 fn main() {
   let xserv = XServer::new();
 
-  println!("Opened a display and found Xrender extension!");
+  println!("Opened a display and found all the necessary X extensions!");
 }
