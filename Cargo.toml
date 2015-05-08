@@ -1,13 +1,11 @@
+[project]
 name = "secondsight"
 version = "0.0.1"
 authors = ["Dan Lidral-Porter <dlp@aperiodic.org>"]
 
-[dependencies.xlib]
-git = "https://github.com/Kintaro/rust-xlib.git"
-branch = "class_hint"
-
-[dependencies.xinerama]
-git = "https://github.com/Kintaro/rust-xinerama.git"
+[dependencies]
+xlib = "*"
+libc = "*"
 
 [[bin]]
 name = "secondsight"
