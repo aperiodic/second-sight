@@ -52,28 +52,36 @@ impl XServer {
       let screen = XDefaultScreenOfDisplay(display);
       let root = XRootWindowOfScreen(screen);
 
-      let mut event_base = &mut 0;
-      let mut error_base = &mut 0;
-      if XCompositeQueryExtension(display, event_base, error_base) == 0 {
-        panic!("No XComposite extension!");
-      }
-      if XDamageQueryExtension(display, event_base, error_base) == 0 {
-        panic!("No XDamage extension!");
-      }
-      if XFixesQueryExtension(display, event_base, error_base) == 0 {
-        panic!("No XFixes extension!");
-      }
-      if XRenderQueryExtension(display, event_base, error_base) == 0 {
-        panic!("No XRender extension!");
-      }
-      if XShapeQueryExtension(display, event_base, error_base) == 0 {
-        panic!("No XShape extension!");
-      }
-
       XServer {
         display: display,
         root: root
       }
+    }
+  }
+}
+
+pub fn query_extension(xserver: &XServer, name: &str) {
+  let mut event_base = &mut 0;
+  let mut error_base = &mut 0;
+
+  unsafe {
+    match name {
+      "Xcomposite" => if XCompositeQueryExtension(xserver.display, event_base, error_base) == 0 {
+                        panic!("No XComposite extension!");
+                      },
+      "Xdamage" => if XDamageQueryExtension(xserver.display, event_base, error_base) == 0 {
+                     panic!("No XDamage extension!");
+                   },
+      "Xfixes" => if XFixesQueryExtension(xserver.display, event_base, error_base) == 0 {
+                    panic!("No XFixes extension!");
+                  },
+      "Xrender" => if XRenderQueryExtension(xserver.display, event_base, error_base) == 0 {
+                     panic!("No XRender extension!");
+                   },
+      "Xshape" => if XShapeQueryExtension(xserver.display, event_base, error_base) == 0 {
+                    panic!("No XShape extension!");
+                  },
+      _ => panic!(format!("Don't know how to query for {} extension", name)),
     }
   }
 }
