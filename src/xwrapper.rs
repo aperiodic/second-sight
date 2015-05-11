@@ -119,6 +119,51 @@ pub fn query_extension(xserver: &XServer, name: &str) {
   }
 }
 
+pub struct WindowSettings {
+  pub opacity: XID,
+  pub type_atom: XID,
+  pub is_desktop: XID,
+  pub is_dock: XID,
+  pub is_toolbar: XID,
+  pub is_menu: XID,
+  pub is_util: XID,
+  pub is_splash: XID,
+  pub is_dialog: XID,
+  pub is_dropdown: XID,
+  pub is_popup: XID,
+  pub is_tooltip: XID,
+  pub is_notification: XID,
+  pub is_combo: XID,
+  pub is_dnd: XID,
+  pub is_normal: XID,
+}
+
+pub fn find_window_settings(xserver: &XServer) -> WindowSettings {
+  WindowSettings {
+    opacity: intern_atom(xserver, "_NET_WM_WINDOW_OPACITY"),
+    type_atom: intern_atom(xserver, "_NET_WM_WINDOW_TYPE"),
+
+    is_desktop: intern_atom(xserver, "_NET_WM_WINDOW_TYPE_DESKTOP"),
+    is_dock: intern_atom(xserver, "_NET_WM_WINDOW_TYPE_DOCK"),
+    is_toolbar: intern_atom(xserver, "_NET_WM_WINDOW_TYPE_TOOLBAR"),
+    is_menu: intern_atom(xserver, "_NET_WM_WINDOW_TYPE_MENU"),
+    is_util: intern_atom(xserver, "_NET_WM_WINDOW_TYPE_UTILITY"),
+    is_splash: intern_atom(xserver, "_NET_WM_WINDOW_TYPE_SPLASH"),
+    is_dialog: intern_atom(xserver, "_NET_WM_WINDOW_TYPE_DIALOG"),
+    is_dropdown: intern_atom(xserver, "_NET_WM_WINDOW_TYPE_DROPDOWN"),
+    is_popup: intern_atom(xserver, "_NET_WM_WINDOW_TYPE_POPUP"),
+    is_tooltip: intern_atom(xserver, "_NET_WM_WINDOW_TYPE_TOOLTIP"),
+    is_notification: intern_atom(xserver, "_NET_WM_WINDOW_TYPE_NOTIFICATION"),
+    is_combo: intern_atom(xserver, "_NET_WM_WINDOW_TYPE_COMBO"),
+    is_dnd: intern_atom(xserver, "_NET_WM_WINDOW_TYPE_DND"),
+    is_normal: intern_atom(xserver, "_NET_WM_WINDOW_TYPE_NORMAL"),
+  }
+}
+
+pub fn intern_atom(xserver: &XServer, name: &str) -> XID {
+  return unsafe { XInternAtom(xserver.display, name.as_ptr() as *mut c_char, 0) };
+}
+
 pub fn register_compositing_window_manager(xserver: &XServer, wm_name: &CStr) -> bool {
   let screen = unsafe { XDefaultScreen(xserver.display) };
   let reg_atom_name = CString::new(format!("_NET_WM_CM_S{}", screen)).unwrap();
