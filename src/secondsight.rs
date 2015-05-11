@@ -1,8 +1,7 @@
 extern crate libc;
 extern crate xlib;
-use xlib::{ XEvent };
 
-use xwrapper::{ XServer, query_extension };
+use xwrapper::{ XServer, query_extension, register_compositing_window_manager };
 mod xwrapper;
 
 fn ensure_extensions(xserver: &XServer) {
@@ -16,6 +15,11 @@ fn ensure_extensions(xserver: &XServer) {
 fn main() {
   let xserver = XServer::new();
   ensure_extensions(&xserver);
+
+  let did_register = register_compositing_window_manager(&xserver);
+  if !did_register {
+    panic!("Another compositing window manager is already running");
+  }
 
   println!("Opened a display and found all the necessary X extensions!");
 }
