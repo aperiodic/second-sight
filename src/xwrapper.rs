@@ -1,7 +1,36 @@
 extern crate xlib;
 
+use libc::*;
 use std::ptr;
-use xlib::{ Display, Window, XDefaultScreenOfDisplay, XOpenDisplay, XQueryExtension, XRootWindowOfScreen };
+use std::ffi;
+use xlib::{ Display, Pixmap, Window, XClassHint, XDefaultScreenOfDisplay, XID, XOpenDisplay, XRootWindowOfScreen, XSizeHints };
+
+//
+// XWMHints Type and Linking Against Xutf8SetWMProperties
+//
+
+#[repr(C)]
+pub struct struct__XWMHints {
+  pub flags: c_long,
+  pub input: c_int,
+  pub initial_state: c_int,
+  pub icon_pixmap: Pixmap,
+  pub icon_window: Window,
+  pub icon_x: c_int,
+  pub icon_y: c_int,
+  pub icon_mask: Pixmap,
+  pub window_group: XID,
+}
+
+pub type XWMHints = struct__XWMHints;
+
+#[link(name = "X11")]
+extern {
+  fn Xutf8SetWMProperties(display: *mut Display, window: Window, window_name: *mut c_char,
+                          icon_name: *mut c_char, argv: *mut *mut c_char, argc: i32,
+                          normal_hints: *mut XSizeHints, wm_hints: *mut XWMHints,
+                          class_hints: *mut XClassHint);
+}
 
 //
 // X Extension Linking
