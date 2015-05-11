@@ -1,8 +1,10 @@
 extern crate xlib;
 
 use libc::*;
+
+use std::ffi::{CString, CStr};
 use std::ptr;
-use std::ffi;
+
 use xlib::{ Display, Pixmap, Window, XClassHint, XCreateSimpleWindow, XDefaultScreen, XDefaultScreenOfDisplay, XGetSelectionOwner, XID, XInternAtom, XOpenDisplay, XRootWindowOfScreen, XSetSelectionOwner, XSizeHints };
 
 static XNone: u64 = 0;
@@ -117,9 +119,9 @@ pub fn query_extension(xserver: &XServer, name: &str) {
   }
 }
 
-pub fn register_compositing_window_manager(xserver: &XServer) -> bool {
+pub fn register_compositing_window_manager(xserver: &XServer, wm_name: &CStr) -> bool {
   let screen = unsafe { XDefaultScreen(xserver.display) };
-  let reg_atom_name = ffi::CString::new(format!("_NET_WM_CM_S{}", screen)).unwrap();
+  let reg_atom_name = CString::new(format!("_NET_WM_CM_S{}", screen)).unwrap();
   let reg_atom = unsafe { XInternAtom(xserver.display, reg_atom_name.as_ptr() as *mut c_char, 0) };
   let extant_window = unsafe { XGetSelectionOwner(xserver.display, reg_atom) };
 
@@ -127,12 +129,11 @@ pub fn register_compositing_window_manager(xserver: &XServer) -> bool {
     return false;
   }
 
-  let name = ffi::CString::new("secondsight").unwrap();
   unsafe {
     let our_window = XCreateSimpleWindow(xserver.display, xserver.root,
                                          0, 0, 1, 1, 0, XNone, XNone);
     Xutf8SetWMProperties(xserver.display, our_window,
-                         name.as_ptr() as *mut c_char, name.as_ptr() as *mut c_char,
+                         wm_name.as_ptr() as *mut c_char, wm_name.as_ptr() as *mut c_char,
                          ptr::null_mut(), 0, ptr::null_mut(), ptr::null_mut(), ptr::null_mut());
     XSetSelectionOwner(xserver.display, reg_atom, our_window, 0);
   };

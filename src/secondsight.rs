@@ -16,7 +16,8 @@ fn main() {
   let xserver = XServer::new();
   ensure_extensions(&xserver);
 
-  let did_register = register_compositing_window_manager(&xserver);
+  let name = ffi::CString::new("secondsight").unwrap();
+  let did_register = register_compositing_window_manager(&xserver, &name);
   if !did_register {
     panic!("Another compositing window manager is already running");
   }
