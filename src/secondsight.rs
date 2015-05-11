@@ -1,5 +1,6 @@
 extern crate libc;
 extern crate xlib;
+extern crate x11;
 
 use std::ffi;
 use xwrapper::{ XServer, WindowSettings, find_window_settings, query_extension, register_compositing_window_manager };

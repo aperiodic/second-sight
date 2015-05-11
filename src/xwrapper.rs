@@ -1,16 +1,16 @@
-extern crate xlib;
-
 use libc::*;
 
 use std::ffi::{CString, CStr};
 use std::ptr;
 
 use xlib::{ Display, Pixmap, Window, XClassHint, XCreateSimpleWindow, XDefaultScreen, XDefaultScreenOfDisplay, XGetSelectionOwner, XID, XInternAtom, XOpenDisplay, XRootWindowOfScreen, XSetSelectionOwner, XSizeHints };
+use x11::xrender::{ XRenderQueryExtension };
+use x11::xlib::{ _XDisplay };
 
 static XNone: u64 = 0;
 
 //
-// XWMHints Type and Linking Against Xutf8SetWMProperties
+// Xlib Types
 //
 
 #[repr(C)]
@@ -25,8 +25,12 @@ pub struct struct__XWMHints {
   pub icon_mask: Pixmap,
   pub window_group: XID,
 }
-
 pub type XWMHints = struct__XWMHints;
+
+//
+// Xlib & X Extensions Linking
+//
+
 
 #[link(name = "X11")]
 extern {
@@ -35,10 +39,6 @@ extern {
                           normal_hints: *mut XSizeHints, wm_hints: *mut XWMHints,
                           class_hints: *mut XClassHint);
 }
-
-//
-// X Extension Linking
-//
 
 #[link(name = "Xcomposite")]
 extern {
@@ -58,11 +58,6 @@ extern {
 #[link(name = "Xfixes")]
 extern {
   fn XFixesQueryExtension(display: *mut Display, event: *mut i32, error: *mut i32) -> i32;
-}
-
-#[link(name = "Xrender")]
-extern {
-  fn XRenderQueryExtension(display: *mut Display, event: *mut i32, error: *mut i32) -> i32;
 }
 
 //
@@ -108,8 +103,11 @@ pub fn query_extension(xserver: &XServer, name: &str) {
       "Xfixes" => if XFixesQueryExtension(xserver.display, event_base, error_base) == 0 {
                     panic!("No XFixes extension!");
                   },
-      "Xrender" => if XRenderQueryExtension(xserver.display, event_base, error_base) == 0 {
-                     panic!("No XRender extension!");
+      "Xrender" => { let have_xrender = XRenderQueryExtension(xserver.display as *mut _XDisplay,
+                                                              event_base, error_base);
+                     if  have_xrender == 0 {
+                       panic!("No XRender extension!");
+                     }
                    },
       "Xshape" => if XShapeQueryExtension(xserver.display, event_base, error_base) == 0 {
                     panic!("No XShape extension!");
