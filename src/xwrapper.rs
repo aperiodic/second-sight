@@ -7,7 +7,12 @@ use xlib::{ Display, Pixmap, Window, XClassHint, XCreateSimpleWindow, XDefaultSc
 use x11::xrender::{ XRenderCreatePicture, XRenderFindVisualFormat, XRenderPictureAttributes, XRenderQueryExtension };
 use x11::xlib::{ _XDisplay, XDefaultVisual };
 
-static XNone: u64 = 0;
+//
+// X Definitions
+//
+
+static XNone: c_ulong = 0;
+static CPSubWindowMode: c_ulong = 1 << 8;
 
 //
 // Xlib Types
@@ -180,6 +185,10 @@ pub fn null_xrender_picture_attributes() -> XRenderPictureAttributes {
   }
 }
 
+//
+// Side-Effecting Stuff
+//
+
 pub fn register_compositing_window_manager(xserver: &XServer, wm_name: &CStr) -> bool {
   let screen = unsafe { XDefaultScreen(xserver.display) };
   let reg_atom_name = CString::new(format!("_NET_WM_CM_S{}", screen)).unwrap();
@@ -200,4 +209,21 @@ pub fn register_compositing_window_manager(xserver: &XServer, wm_name: &CStr) ->
   };
 
   return true;
+}
+
+pub fn create_root_picture(xserver: &XServer, attributes: &mut XRenderPictureAttributes) -> c_ulong {
+  let display = xserver.display;
+  let xr_display = xserver.display as *mut _XDisplay;
+  let format = unsafe {
+    XRenderFindVisualFormat(xr_display, XDefaultVisual(xr_display, XDefaultScreen(display)))
+  };
+
+  return unsafe {
+    XRenderCreatePicture( xr_display
+                        , xserver.root
+                        , format
+                        , CPSubWindowMode
+                        , attributes
+                        )
+  };
 }

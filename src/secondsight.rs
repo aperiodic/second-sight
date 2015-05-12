@@ -3,7 +3,9 @@ extern crate xlib;
 extern crate x11;
 
 use std::ffi;
-use xwrapper::{ XServer, WindowSettings, find_window_settings, query_extension, register_compositing_window_manager };
+use x11::xrender::{ XRenderPictureAttributes };
+
+use xwrapper::{ XServer, WindowSettings, create_root_picture, find_window_settings, null_xrender_picture_attributes, query_extension, register_compositing_window_manager };
 mod xwrapper;
 
 fn ensure_extensions(xserver: &XServer) {
@@ -26,5 +28,8 @@ fn main() {
 
   let settings = find_window_settings(&xserver);
 
-  println!("Opened a display and found all the necessary X extensions!");
+  let mut root_pic_attrs = null_xrender_picture_attributes();
+  let root_pic = create_root_picture(&xserver, &mut root_pic_attrs);
+
+  println!("Created root picture: {}", root_pic);
 }
