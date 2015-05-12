@@ -4,8 +4,8 @@ use std::ffi::{CString, CStr};
 use std::ptr;
 
 use xlib::{ Display, Pixmap, Window, XClassHint, XCreateSimpleWindow, XDefaultScreen, XDefaultScreenOfDisplay, XGetSelectionOwner, XID, XInternAtom, XOpenDisplay, XRootWindowOfScreen, XSetSelectionOwner, XSizeHints };
-use x11::xrender::{ XRenderQueryExtension };
-use x11::xlib::{ _XDisplay };
+use x11::xrender::{ XRenderCreatePicture, XRenderFindVisualFormat, XRenderPictureAttributes, XRenderQueryExtension };
+use x11::xlib::{ _XDisplay, XDefaultVisual };
 
 static XNone: u64 = 0;
 
@@ -160,6 +160,24 @@ pub fn find_window_settings(xserver: &XServer) -> WindowSettings {
 
 pub fn intern_atom(xserver: &XServer, name: &str) -> XID {
   return unsafe { XInternAtom(xserver.display, name.as_ptr() as *mut c_char, 0) };
+}
+
+pub fn null_xrender_picture_attributes() -> XRenderPictureAttributes {
+  return XRenderPictureAttributes {
+    repeat: 0,
+    alpha_map: XNone,
+    alpha_x_origin: 0,
+    alpha_y_origin: 0,
+    clip_x_origin: 0,
+    clip_y_origin: 0,
+    clip_mask: XNone,
+    graphics_exposures: 0,
+    subwindow_mode: 0,
+    poly_edge: 0,
+    poly_mode: 0,
+    dither: XNone,
+    component_alpha: 0,
+  }
 }
 
 pub fn register_compositing_window_manager(xserver: &XServer, wm_name: &CStr) -> bool {
